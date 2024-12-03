@@ -11,16 +11,19 @@ fn main() -> io::Result<()> {
     let mut list_a: Vec<i32> = Vec::new();
     let mut list_b: Vec<i32> = Vec::new();
 
-    for line in reader.lines() {
-        match line {
-            Ok(content) => {
-                let mut parts = content.split_whitespace();
-                list_a.push(parts.nth(0).unwrap().parse::<i32>().unwrap());
-                list_b.push(parts.last().unwrap().parse::<i32>().unwrap());
+    reader
+        .lines()
+        .filter_map(|line| line.ok())
+        .for_each(|content| {
+            let mut parts = content.split_whitespace();
+            if let (Some(first), Some(last)) = (parts.next(), parts.last()) {
+                if let (Ok(a), Ok(b)) = (first.parse::<i32>(), last.parse::<i32>()) {
+                    list_a.push(a);
+                    list_b.push(b);
+                }
             }
-            Err(e) => eprintln!("Error reading line: {e}"),
-        }
-    }
+        });
+
     list_a.sort();
     list_b.sort();
 
@@ -32,24 +35,24 @@ fn main() -> io::Result<()> {
 
     let mut map: HashMap<i32, (i32, i32)> = HashMap::new();
 
-    for num in list_a.clone() {
-        map.insert(num, (0, 0));
+    for num in &list_a {
+        map.insert(*num, (0, 0));
     }
 
-    for num in list_a.clone() {
+    for num in &list_a {
         if let Some((_, right)) = map.get_mut(&num) {
             *right += 1;
         }
     }
 
-    for num in list_b {
+    for num in &list_b {
         if let Some((left, _)) = map.get_mut(&num) {
             *left += 1;
         }
     }
 
     let mut similarity: i32 = 0;
-    for (key, (left, right)) in map {
+    for (key, (left, right)) in &map {
         similarity += key * left * right;
     }
     println!("PartB: The similarity between the lists is: {similarity}");
