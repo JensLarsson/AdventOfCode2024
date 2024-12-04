@@ -16,34 +16,49 @@ fn main() -> io::Result<()> {
             let mut nums = content
                 .split_whitespace()
                 .filter_map(|word| word.parse::<i32>().ok());
-            let mut check = 0;
-            let mut prev_diff = 0;
-            let mut prev = nums.next().unwrap();
-            for curr in nums.clone() {
-                let mut diff = prev - curr;
-                if diff.abs() > 3 {
+            let length = nums.clone().count() as i32;
+            for i in 0..length {
+                let mut num_range: Vec<i32> = nums.clone().collect();
+                num_range.remove(i as usize);
+                if check(num_range) {
+                    println!("{content}");
+                    count += 1;
                     break;
                 }
-                prev = curr;
-                if diff == 0 {
-                    break;
-                }
-                diff /= diff.abs();
-
-                if diff > 0 && prev_diff < 0 {
-                    break;
-                }
-                if diff < 0 && prev_diff > 0 {
-                    break;
-                }
-                check += 1;
-                prev_diff = diff;
-            }
-            if check == nums.count() {
-                println!("{content}");
-                count += 1;
             }
         });
     println!("{count}");
     Ok(())
+}
+
+fn check(mut nums: Vec<i32>) -> bool {
+    let mut skip = true;
+    let mut check = 0;
+    let mut prev_diff = 0;
+    let mut prev = nums.first().unwrap().clone();
+    nums.remove(0);
+    for curr in nums.clone() {
+        let mut diff = prev - curr;
+        if diff.abs() > 3 {
+            break;
+        }
+        if diff == 0 {
+            break;
+        }
+        diff /= diff.abs();
+
+        if diff > 0 && prev_diff < 0 {
+            break;
+        }
+        if diff < 0 && prev_diff > 0 {
+            break;
+        }
+        prev = curr;
+        check += 1;
+        prev_diff = diff;
+    }
+    if check == nums.len() {
+        return true;
+    }
+    false
 }
