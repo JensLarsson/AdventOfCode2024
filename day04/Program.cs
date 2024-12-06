@@ -4,18 +4,19 @@
     {
         var lines = File.ReadLines("input.txt");
         int[,] matrix = GetIntArray(lines.ToList());
-        int matches = 0;
+        int matchesPartA = 0;
+        int matchesPartB = 0;
 
 
         int[,] kernel = {
             { 'X', 'M', 'A', 'S' }
         };
-        matches += CountKernelMatches(matrix, kernel);
+        matchesPartA += CountKernelMatches(matrix, kernel);
 
         kernel = new int[,] {
             { 'S', 'A', 'M', 'X' }
         };
-        matches += CountKernelMatches(matrix, kernel);
+        matchesPartA += CountKernelMatches(matrix, kernel);
 
         kernel = new int[,] {
             { 'X' },
@@ -23,7 +24,7 @@
             { 'A' },
             { 'S' },
         };
-        matches += CountKernelMatches(matrix, kernel);
+        matchesPartA += CountKernelMatches(matrix, kernel);
 
         kernel = new int[,] {
             { 'S' },
@@ -31,7 +32,7 @@
             { 'M' },
             { 'X' },
         };
-        matches += CountKernelMatches(matrix, kernel);
+        matchesPartA += CountKernelMatches(matrix, kernel);
 
         kernel = new int[,] {
             { 'S', -1, -1, -1 },
@@ -39,7 +40,7 @@
             { -1, -1, 'M', -1, },
             { -1, -1, -1, 'X' },
         };
-        matches += CountKernelMatches(matrix, kernel);
+        matchesPartA += CountKernelMatches(matrix, kernel);
 
         kernel = new int[,] {
             { 'X', -1 ,-1, -1 },
@@ -47,7 +48,7 @@
             { -1, -1, 'A', -1, },
             { -1, -1, -1, 'S' },
         };
-        matches += CountKernelMatches(matrix, kernel);
+        matchesPartA += CountKernelMatches(matrix, kernel);
 
         kernel = new int[,] {
             { -1, -1, -1, 'X'},
@@ -55,7 +56,7 @@
             { -1, 'A', -1, -1},
             { 'S', -1, -1, -1},
         };
-        matches += CountKernelMatches(matrix, kernel);
+        matchesPartA += CountKernelMatches(matrix, kernel);
 
         kernel = new int[,] {
             { -1, -1, -1, 'S'},
@@ -63,9 +64,40 @@
             { -1, 'M', -1, -1},
             { 'X', -1, -1, -1},
         };
-        matches += CountKernelMatches(matrix, kernel);
+        matchesPartA += CountKernelMatches(matrix, kernel);
+        Console.WriteLine($"Part1 Number of Kernel Matches: {matchesPartA}");
 
-        Console.WriteLine($"Number of Kernel Matches: {matches}");
+        kernel = new int[,] {
+            { 'M', -1, 'S'},
+            { -1, 'A', -1},
+            { 'M', -1, 'S'},
+        };
+        matchesPartB += CountKernelMatches(matrix, kernel);
+
+        kernel = new int[,] {
+            { 'S', -1, 'M'},
+            { -1, 'A', -1},
+            { 'S', -1, 'M'},
+        };
+        matchesPartB += CountKernelMatches(matrix, kernel);
+
+        kernel = new int[,] {
+            { 'M', -1, 'M'},
+            { -1, 'A', -1},
+            { 'S', -1, 'S'},
+        };
+        matchesPartB += CountKernelMatches(matrix, kernel);
+
+        kernel = new int[,] {
+            { 'S', -1, 'S'},
+            { -1, 'A', -1},
+            { 'M', -1, 'M'},
+        };
+        matchesPartB += CountKernelMatches(matrix, kernel);
+
+
+
+        Console.WriteLine($"Part2 Number of Kernel Matches: {matchesPartB}");
     }
 
     static int[,] GetIntArray(List<string> lines)
