@@ -7,95 +7,71 @@
         int matchesPartA = 0;
         int matchesPartB = 0;
 
-
-        int[,] kernel = {
-            { 'X', 'M', 'A', 'S' }
+        int[][,] kernelsPartA = {
+            new int[,] { { 'X', 'M', 'A', 'S' } },
+            new int[,] { { 'S', 'A', 'M', 'X' } },
+            new int[,] { { 'X' }, { 'M' }, { 'A' }, { 'S' } },
+            new int[,] { { 'S' }, { 'A' }, { 'M' }, { 'X' } },
+            new int[,] {
+                { 'S', -1, -1, -1 },
+                { -1, 'A', -1, -1 },
+                { -1, -1, 'M', -1 },
+                { -1, -1, -1, 'X' },
+            },
+            new int[,] {
+                { 'X', -1, -1, -1 },
+                { -1, 'M', -1, -1 },
+                { -1, -1, 'A', -1 },
+                { -1, -1, -1, 'S' },
+            },
+            new int[,] {
+                { -1, -1, -1, 'X' },
+                { -1, -1, 'M', -1 },
+                { -1, 'A', -1, -1 },
+                { 'S', -1, -1, -1 },
+            },
+            new int[,] {
+                { -1, -1, -1, 'S' },
+                { -1, -1, 'A', -1 },
+                { -1, 'M', -1, -1 },
+                { 'X', -1, -1, -1 },
+            }
         };
-        matchesPartA += CountKernelMatches(matrix, kernel);
 
-        kernel = new int[,] {
-            { 'S', 'A', 'M', 'X' }
+        int[][,] kernelsPartB = {
+            new int[,] {
+                { 'M', -1, 'S' },
+                { -1, 'A', -1 },
+                { 'M', -1, 'S' },
+            },
+            new int[,] {
+                { 'S', -1, 'M' },
+                { -1, 'A', -1 },
+                { 'S', -1, 'M' },
+            },
+            new int[,] {
+                { 'M', -1, 'M' },
+                { -1, 'A', -1 },
+                { 'S', -1, 'S' },
+            },
+            new int[,] {
+                { 'S', -1, 'S' },
+                { -1, 'A', -1 },
+                { 'M', -1, 'M' },
+            }
         };
-        matchesPartA += CountKernelMatches(matrix, kernel);
 
-        kernel = new int[,] {
-            { 'X' },
-            { 'M' },
-            { 'A' },
-            { 'S' },
-        };
-        matchesPartA += CountKernelMatches(matrix, kernel);
+        foreach (var kernel in kernelsPartA)
+        {
+            matchesPartA += CountKernelMatches(matrix, kernel);
+        }
 
-        kernel = new int[,] {
-            { 'S' },
-            { 'A' },
-            { 'M' },
-            { 'X' },
-        };
-        matchesPartA += CountKernelMatches(matrix, kernel);
-
-        kernel = new int[,] {
-            { 'S', -1, -1, -1 },
-            { -1, 'A', -1, -1, },
-            { -1, -1, 'M', -1, },
-            { -1, -1, -1, 'X' },
-        };
-        matchesPartA += CountKernelMatches(matrix, kernel);
-
-        kernel = new int[,] {
-            { 'X', -1 ,-1, -1 },
-            { -1, 'M', -1, -1, },
-            { -1, -1, 'A', -1, },
-            { -1, -1, -1, 'S' },
-        };
-        matchesPartA += CountKernelMatches(matrix, kernel);
-
-        kernel = new int[,] {
-            { -1, -1, -1, 'X'},
-            { -1, -1, 'M', -1},
-            { -1, 'A', -1, -1},
-            { 'S', -1, -1, -1},
-        };
-        matchesPartA += CountKernelMatches(matrix, kernel);
-
-        kernel = new int[,] {
-            { -1, -1, -1, 'S'},
-            { -1, -1, 'A', -1},
-            { -1, 'M', -1, -1},
-            { 'X', -1, -1, -1},
-        };
-        matchesPartA += CountKernelMatches(matrix, kernel);
         Console.WriteLine($"Part1 Number of Kernel Matches: {matchesPartA}");
 
-        kernel = new int[,] {
-            { 'M', -1, 'S'},
-            { -1, 'A', -1},
-            { 'M', -1, 'S'},
-        };
-        matchesPartB += CountKernelMatches(matrix, kernel);
-
-        kernel = new int[,] {
-            { 'S', -1, 'M'},
-            { -1, 'A', -1},
-            { 'S', -1, 'M'},
-        };
-        matchesPartB += CountKernelMatches(matrix, kernel);
-
-        kernel = new int[,] {
-            { 'M', -1, 'M'},
-            { -1, 'A', -1},
-            { 'S', -1, 'S'},
-        };
-        matchesPartB += CountKernelMatches(matrix, kernel);
-
-        kernel = new int[,] {
-            { 'S', -1, 'S'},
-            { -1, 'A', -1},
-            { 'M', -1, 'M'},
-        };
-        matchesPartB += CountKernelMatches(matrix, kernel);
-
-
+        foreach (var kernel in kernelsPartB)
+        {
+            matchesPartB += CountKernelMatches(matrix, kernel);
+        }
 
         Console.WriteLine($"Part2 Number of Kernel Matches: {matchesPartB}");
     }
