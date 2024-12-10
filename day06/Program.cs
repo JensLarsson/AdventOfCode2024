@@ -15,47 +15,41 @@ class Program
         var lines = File.ReadAllLines("input.txt");
         int height = lines.Count();
         int width = lines[0].Count();
-        int[,] grid = GetGrid(lines);
         var playerPos = GetPlayerStartPosition(lines);
         var playerDirection = new Vec2i(0, 1);
-        while (true)
-        {
-            grid[playerPos.X, playerPos.Y] = '^';
-            var nextPos = playerPos - playerDirection;
 
-            //if outside grid
-            if (nextPos.X < 0 || nextPos.X >= width || nextPos.Y < 0 || nextPos.Y >= height)
-            {
-                break;
-            }
-
-            if (grid[nextPos.X, nextPos.Y] == '#')
-            {
-                playerDirection = playerDirection switch
-                {
-                    { X: 0, Y: 1 } => new Vec2i(-1, 0),
-                    { X: -1, Y: 0 } => new Vec2i(0, -1),
-                    { X: 0, Y: -1 } => new Vec2i(1, 0),
-                    { X: 1, Y: 0 } => new Vec2i(0, 1)
-                };
-            }
-            else
-            {
-                playerPos = nextPos;
-            }
-        }
+        var traversedGrid = TraverseGrid(GetGrid(lines), playerPos, playerDirection);
 
         int count = 0;
         for (int y = 0; y < height; y++)
         {
             for (int x = 0; x < width; x++)
             {
-                count += grid[x, y] == '^' ? 1 : 0;
-                Console.Write((char)grid[x, y]);
+                count += traversedGrid[x, y] == '^' ? 1 : 0;
+                Console.Write((char)traversedGrid[x, y]);
             }
             Console.Write("\n");
         }
         Console.WriteLine(count);
+
+        int positions = 0;
+        for (int y = 0; y < height; y++)
+        {
+            for (int x = 0; x < width; x++)
+            {
+                if (traversedGrid[x, y] == '#')
+                {
+                    continue;
+                }
+                traversedGrid[x, y] = '#';
+                if (TraverseGrid(traversedGrid, playerPos, playerDirection, count * 2) == null)
+                {
+                    positions++;
+                }
+                traversedGrid[x, y] = '.';
+            }
+        }
+        Console.WriteLine(positions);
     }
     static Vec2i GetPlayerStartPosition(string[] text)
     {
@@ -79,6 +73,43 @@ class Program
             for (int x = 0; x < text[y].Count(); x++)
             {
                 grid[x, y] = text[y][x];
+            }
+        }
+        return grid;
+    }
+    static int[,] TraverseGrid(int[,] grid, Vec2i playerPos, Vec2i playerDirection, int maxDistance = 10000)
+    {
+        int width = grid.GetLength(1);
+        int height = grid.GetLength(1);
+        while (true)
+        {
+            maxDistance--;
+            if (maxDistance <= 0)
+            {
+                return null;
+            }
+            grid[playerPos.X, playerPos.Y] = '^';
+            var nextPos = playerPos - playerDirection;
+
+            //if outside grid
+            if (nextPos.X < 0 || nextPos.X >= width || nextPos.Y < 0 || nextPos.Y >= height)
+            {
+                break;
+            }
+
+            if (grid[nextPos.X, nextPos.Y] == '#')
+            {
+                playerDirection = playerDirection switch
+                {
+                    { X: 0, Y: 1 } => new Vec2i(-1, 0),
+                    { X: -1, Y: 0 } => new Vec2i(0, -1),
+                    { X: 0, Y: -1 } => new Vec2i(1, 0),
+                    { X: 1, Y: 0 } => new Vec2i(0, 1)
+                };
+            }
+            else
+            {
+                playerPos = nextPos;
             }
         }
         return grid;
