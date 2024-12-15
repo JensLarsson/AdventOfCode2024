@@ -25,10 +25,8 @@ foreach (var startPos in startPositions)
 {
     foreach (var endPos in endPositions)
     {
-        if (AStar.FindPath(grid, startPos, endPos, (a, b) => a < b && b - a == 1) != null)
-        {
-            total++;
-        }
+        var paths = AStar.FindPaths(grid, startPos, endPos, (a, b) => a < b && b - a == 1);
+        total += paths.Count;
     }
 }
 Console.WriteLine(total);

@@ -23,7 +23,7 @@ public static class AStar
 
         openSet.Enqueue(start, 0);
         gScore[start] = 0;
-        fScore[start] = Heuristic(start, goal);
+        fScore[start] = ManhattanDistance(start, goal);
 
         while (openSet.Count > 0)
         {
@@ -49,7 +49,7 @@ public static class AStar
                 {
                     cameFrom[neighbor] = current;
                     gScore[neighbor] = tentativeGScore;
-                    fScore[neighbor] = tentativeGScore + Heuristic(neighbor, goal);
+                    fScore[neighbor] = tentativeGScore + ManhattanDistance(neighbor, goal);
 
                     if (!openSet.Contains(neighbor))
                     {
@@ -61,7 +61,34 @@ public static class AStar
         return null;
     }
 
-    private static int Heuristic(GridPosition a, GridPosition b)
+    //This is no longer A*, but width first, but who cares
+    public static List<List<GridPosition>> FindPaths(int[,] grid, GridPosition start, GridPosition goal, Func<int, int, bool> predicate)
+    {
+        var openSet = new Queue<GridPosition>();
+        var cameFrom = new Dictionary<GridPosition, GridPosition>();
+        var paths = new List<List<GridPosition>>();
+
+        openSet.Enqueue(start);
+
+        while (openSet.Count > 0)
+        {
+            var current = openSet.Dequeue();
+
+            if (current.Equals(goal))
+            {
+                paths.Add(ReconstructPath(cameFrom, current));
+                continue;
+            }
+            foreach (var neighbor in GetNeighbors(grid, current, predicate))
+            {
+                cameFrom[neighbor] = current;
+                openSet.Enqueue(neighbor);
+            }
+        }
+        return paths;
+    }
+
+    private static int ManhattanDistance(GridPosition a, GridPosition b)
     {
         return Math.Abs(a.X - b.X) + Math.Abs(a.Y - b.Y);
     }
