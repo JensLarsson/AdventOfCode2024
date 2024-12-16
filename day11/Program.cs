@@ -1,14 +1,11 @@
-﻿
+﻿public record Key(ulong num, int depth)
+{
+    ulong Num = num;
+    int Depth = depth;
+}
 public class Program
 {
-
-    static Action<ulong, List<ulong>> onZero = (ulong num, List<ulong> list) => list.Add(1);
-    static Action<ulong, List<ulong>> onElse = (ulong num, List<ulong> list) => list.Add(num * 2024);
-    static Action<ulong, List<ulong>> onEvenLength = (ulong num, List<ulong> list) =>
-    {
-    };
-
-
+    static Dictionary<Key, ulong> solved = new();
     static void Main()
     {
         var line = File.ReadAllText("input.txt");
@@ -17,51 +14,47 @@ public class Program
             .Select(s => ulong.Parse(s))
             .ToList();
 
-        ulong count = GetSize(25, nums);
-
-        Console.WriteLine(count);
-    }
-    static ulong GetSize(int maxDepth, List<ulong> nums)
-    {
+        long start = GC.GetAllocatedBytesForCurrentThread();
         ulong nodes = 0;
         foreach (var num in nums)
         {
-            GetValue(num, maxDepth, 0, ref nodes);
+            nodes += GetValue(num, 75, 0);
         }
-        return nodes;
+
+        long end = GC.GetAllocatedBytesForCurrentThread();
+        Console.WriteLine($"Memory allocated: {end - start} bytes");
+        Console.WriteLine(nodes);
     }
-    static ulong GetValue(ulong num, int maxDepth, int depth, ref ulong nodes)
+    static ulong GetValue(ulong num, int maxDepth, int depth)
     {
-        depth++;
-        if (depth <= maxDepth)
+        if (depth++ < maxDepth)
         {
-            if (num == 0)
+            ulong result = 0;
+            var key = new Key(num, maxDepth - depth);
+            if (solved.TryGetValue(key, out result)) { }
+            else if (num == 0)                      //make 1
             {
-                GetValue(1, maxDepth, depth, ref nodes);
+                result = GetValue(1, maxDepth, depth);
             }
-            else if (num.ToString().Length % 2 == 0)
+            else if ((int)Math.Floor(Math.Log10(num) + 1) is int length && length % 2 == 0)//split into two values
             {
-                Span<char> numSpan = stackalloc char[num.ToString().Length];
+                Span<char> numSpan = stackalloc char[length];
                 num.TryFormat(numSpan, out int charsWritten);
 
                 int mid = charsWritten / 2;
                 ReadOnlySpan<char> firstHalf = numSpan[..mid];
                 ReadOnlySpan<char> secondHalf = numSpan[mid..];
 
-                GetValue(ulong.Parse(firstHalf), maxDepth, depth, ref nodes);
-                GetValue(ulong.Parse(secondHalf), maxDepth, depth, ref nodes);
+                var a = GetValue(ulong.Parse(firstHalf), maxDepth, depth);
+                result = a + GetValue(ulong.Parse(secondHalf), maxDepth, depth);
             }
-            else
+            else                                   //multiply with 2024
             {
-                GetValue(num * 2024, maxDepth, depth, ref nodes);
+                result = GetValue(num * 2024, maxDepth, depth);
             }
+            solved.TryAdd(key, result);
+            return result;
         }
-        else
-        {
-            nodes++;
-        }
-        return nodes;
+        return 1;
     }
 }
-
-
