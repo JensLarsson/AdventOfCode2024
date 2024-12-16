@@ -1,56 +1,38 @@
-﻿public record Key(ulong num, int depth)
-{
-    ulong Num = num;
-    int Depth = depth;
-}
+﻿public record Key(ulong num, int depth);
 public class Program
 {
-    static Dictionary<Key, ulong> solved = new();
     static void Main()
     {
-        var line = File.ReadAllText("input.txt");
-        List<ulong> nums = line
+        ulong nodes = File.ReadAllText("input.txt")
             .Split(' ', StringSplitOptions.RemoveEmptyEntries)
             .Select(s => ulong.Parse(s))
-            .ToList();
+            .Aggregate(0UL, (acc, num) => acc + GetValue(num, 75, new()));
 
-        long start = GC.GetAllocatedBytesForCurrentThread();
-        ulong nodes = 0;
-        foreach (var num in nums)
-        {
-            nodes += GetValue(num, 75, 0);
-        }
-
-        long end = GC.GetAllocatedBytesForCurrentThread();
-        Console.WriteLine($"Memory allocated: {end - start} bytes");
         Console.WriteLine(nodes);
     }
-    static ulong GetValue(ulong num, int maxDepth, int depth)
+
+    static ulong GetValue(ulong num, int maxDepth, Dictionary<Key, ulong> solved)
     {
-        if (depth++ < maxDepth)
+        if (maxDepth-- > 0)
         {
-            ulong result = 0;
-            var key = new Key(num, maxDepth - depth);
-            if (solved.TryGetValue(key, out result)) { }
+            var key = new Key(num, maxDepth);
+            if (solved.TryGetValue(key, out var result)) ;
             else if (num == 0)                      //make 1
             {
-                result = GetValue(1, maxDepth, depth);
+                result = GetValue(1, maxDepth, solved);
             }
-            else if ((int)Math.Floor(Math.Log10(num) + 1) is int length && length % 2 == 0)//split into two values
+            else if ((int)Math.Floor(Math.Log10(num) + 1) is int length && length % 2 == 0)
             {
-                Span<char> numSpan = stackalloc char[length];
-                num.TryFormat(numSpan, out int charsWritten);
+                ulong divisor = (ulong)Math.Pow(10, length / 2);
+                ulong leftPart = num / divisor;     //123456 / 1000 = 123 due to flooring the decimals
+                ulong rightPart = num % divisor;    //123456 % 123  = 456
 
-                int mid = charsWritten / 2;
-                ReadOnlySpan<char> firstHalf = numSpan[..mid];
-                ReadOnlySpan<char> secondHalf = numSpan[mid..];
-
-                var a = GetValue(ulong.Parse(firstHalf), maxDepth, depth);
-                result = a + GetValue(ulong.Parse(secondHalf), maxDepth, depth);
+                var a = GetValue(leftPart, maxDepth, solved);
+                result = a + GetValue(rightPart, maxDepth, solved);
             }
-            else                                   //multiply with 2024
-            {
-                result = GetValue(num * 2024, maxDepth, depth);
+            else
+            {//multiply with 2024
+                result = GetValue(num * 2024, maxDepth, solved);
             }
             solved.TryAdd(key, result);
             return result;
